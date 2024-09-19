@@ -1,0 +1,72 @@
+name: Auth CI
+
+on:
+  push:
+    branches: [ "dev", "main" ]
+  pull_request:
+    branches: [ "dev", "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7.2.5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@main
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.4'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "${{ github.workspace }}/.local/bin" >> $GITHUB_PATH
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: autopep8
+        id: autopep8
+        uses: peter-evans/autopep8@v2
+        with:
+          args: --recursive --in-place --aggressive --aggressive .
+
+      - name: Run hadolint
+        uses: hadolint/hadolint-action@v2.0.0
+        with:
+          args: Dockerfile PostgresDockerfile
+          ignore: 'DL3042,DL3008'
+        continue-on-error: true
+
+      - name: Run style checks
+        run: |
+            poetry run flake8 --ignore D100,D104,WPS411 src
+        continue-on-error: true
+
+      - name: Run isort
+        uses: isort/isort-action@master
+
+      - name: Run tests
+        run: poetry run coverage run -m pytest  -v -s
+
+      - name: Generate Coverage Report
+        run: coverage report -m

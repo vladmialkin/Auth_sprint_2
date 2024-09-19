@@ -1,0 +1,15 @@
+FROM python:3.12
+
+WORKDIR /opt/app/
+ENV PYTHONPATH /opt/app
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+RUN apt update && pip install --upgrade pip
+COPY /requirements/main.txt main.txt
+COPY /requirements/test.txt requirements.txt
+RUN pip install -r requirements.txt
+
+COPY . .
+
+ENTRYPOINT ["/bin/sh", "-c", "alembic upgrade head && pytest -p no:warnings --log-cli-level=ERROR -vv --color=yes"]

@@ -1,0 +1,10 @@
+FROM python:3.11
+
+WORKDIR /opt/
+
+COPY etl etl/
+
+RUN  pip install --no-cache-dir --upgrade pip \
+     && pip install -r etl/requirements.txt
+
+ENTRYPOINT ["python3", "etl/main.py"]

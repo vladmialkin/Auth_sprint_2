@@ -1,0 +1,6 @@
+-r main.txt
+
+iniconfig==2.0.0
+pluggy==1.5.0
+ruff==0.6.2
+packaging==24.1
