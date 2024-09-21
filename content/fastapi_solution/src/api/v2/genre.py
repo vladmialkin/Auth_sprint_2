@@ -3,10 +3,10 @@ from fastapi import APIRouter, HTTPException, status, Path
 from ...repository.elasticsearch import ESRepository
 from ...repository.redis import RedisRepository
 from ...service.genre import GenreService
-from ..deps import ESConnection, RedisConnection
+from ..deps import ESConnection, RedisConnection, UserData
 from ..v2.schemas.genre import GenreSchema
 
-router = APIRouter()
+router = APIRouter(dependencies=[UserData])
 
 
 @router.get(

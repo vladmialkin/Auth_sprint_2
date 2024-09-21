@@ -5,10 +5,10 @@ from fastapi import APIRouter, HTTPException, status, Query, Path
 from ...repository.elasticsearch import ESRepository
 from ...repository.redis import RedisRepository
 from ...service.film import FilmService
-from ..deps import ESConnection, RedisConnection
+from ..deps import ESConnection, RedisConnection, UserData
 from ..v2.schemas.film import FilmSchema
 
-router = APIRouter()
+router = APIRouter(dependencies=[UserData])
 
 
 @router.get(

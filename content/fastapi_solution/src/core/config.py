@@ -26,5 +26,9 @@ class Settings(BaseSettings):
     # RETRY POLICY
     MAX_TRIES: int = 10
 
+    AUTH_API_URL=""
+    JWT_ALGORITHM: str = "HS256"
+    AUDIENCE: str = "fastapi"
+    SECRET: str = "SECRET"
 
 settings = Settings()

@@ -5,6 +5,7 @@ from app.api.deps.fastapi_users import (
     AccessStrategy,
     CurrentUserByRefreshToken,
     CurrentUserToken,
+    CurrentUser,
     OAuth2Credentials,
     RefreshStrategy,
     Session,
@@ -74,6 +75,12 @@ async def refresh(
     return await authentication_backend.refresh(
         access_strategy, refresh_strategy, user, session, user_agent
     )
+
+
+@router.post("/check")
+async def check(user: CurrentUser) -> UserRetrieveSchema:
+    """Проверка активности пользователя."""
+    return user
 
 
 router.include_router(
