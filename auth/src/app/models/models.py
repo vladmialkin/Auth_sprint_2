@@ -60,9 +60,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
 class Role(Base):
     name: Mapped[UUID] = mapped_column(String(NAME_STR_LEN), unique=True)
 
-    users: Mapped[list[User]] = relationship(
-        "User", secondary=user_role, back_populates="roles"
-    )
+    users = relationship("User", secondary=user_role, back_populates="roles")
 
     def __str__(self) -> str:
         return f"Role ({self.id}) {self.name}"
@@ -78,11 +76,12 @@ class RefreshToken(Base):
         "Session", back_populates="refresh_token"
     )
 
-    def __str__(self) -> str:
-        return f"RefreshToken ({self.id}) {self.token[:6]}"
-
 
 class Session(Base):
+    __table_args__ = {
+        "postgresql_partition_by": "RANGE (created_at)",
+    }
+
     user_id: Mapped[PY_UUID] = mapped_column(ForeignKey("user.id"))
     refresh_token_id: Mapped[PY_UUID] = mapped_column(
         ForeignKey("refreshtoken.id")
