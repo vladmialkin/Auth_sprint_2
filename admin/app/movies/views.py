@@ -3,6 +3,7 @@ from drf_spectacular.utils import extend_schema
 from movies.models import FilmWork
 from movies.serializers import FilmWorkSerializer
 from rest_framework import generics
+from movies.authentication import Authentication
 
 
 @method_decorator(
@@ -13,6 +14,7 @@ from rest_framework import generics
     ),
 )
 class FilmWorkListView(generics.ListAPIView):
+    authentication_classes = [Authentication]
     queryset = FilmWork.objects.all()
     serializer_class = FilmWorkSerializer
 
@@ -22,5 +24,6 @@ class FilmWorkListView(generics.ListAPIView):
     decorator=extend_schema(tags=["Киноленты"], description="Получить киноленту"),
 )
 class FilmWorkDetailView(generics.RetrieveAPIView):
+    authentication_classes = [Authentication]
     queryset = FilmWork.objects.all()
     serializer_class = FilmWorkSerializer
