@@ -25,4 +25,5 @@ include(
     "components/drf.py",
     "components/redis.py",
     "components/constance.py",
+    "components/auth_service.py",
 )
