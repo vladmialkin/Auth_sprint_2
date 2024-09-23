@@ -27,10 +27,10 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractBaseUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+    is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    is_superuser = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
 
     # строка с именем поля модели, которая используется в качестве уникального идентификатора
     USERNAME_FIELD = 'email'

@@ -52,3 +52,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 WSGI_APPLICATION = "config.wsgi.application"
+
+AUTH_USER_MODEL = "movies.User"
+
+AUTHENTICATION_BACKENDS = [
+    'movies.authentication.CustomAuthentication',
+]
