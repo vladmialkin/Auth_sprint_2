@@ -8,14 +8,6 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None):
-        if not email:
-            raise ValueError('Users must have an email address')
-
-        user = self.model(email=self.normalize_email(email))
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
 
     def create_superuser(self, email, password=None):
         user = self.create_user(email, password=password)
@@ -31,6 +23,7 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
+    password = None
 
     # строка с именем поля модели, которая используется в качестве уникального идентификатора
     USERNAME_FIELD = 'email'

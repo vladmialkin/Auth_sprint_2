@@ -25,25 +25,31 @@ class Authentication(authentication.BaseAuthentication):
         raise exceptions.AuthenticationFailed("Not authenticated")
 
 
-# Улучшенный метод аутентификации
 class CustomAuthentication(BaseBackend):
     def authenticate(self, request, username=None, password=None):
         try:
             response = auth_client.login(username, password)
 
-            if len(response) == 2:
-                data = auth_client.check_token(response.get('access_token'))
-                user, created = User.objects.get_or_create(id=data.get('id'))
-                if created is False:
-                    user.email = data.get('email')
-                    user.is_active = data.get('is_active')
-                    user.is_superuser = data.get('is_superuser')
-                    user.is_verified = data.get('is_verified')
-                    user.save()
+            if 'access_token' not in response:
+                return None
+
+            data = auth_client.check_token(response['access_token'])
+
+            if data.get('is_active'):
+                try:
+                    user = User.objects.get(email=data.get('email'))
+                except User.DoesNotExist:
+                    user = User.objects.create(
+                        id=data.get('id'),
+                        email=data.get('email'),
+                        is_active=data.get('is_active', True),
+                        is_superuser=data.get('is_superuser', False),
+                        is_verified=data.get('is_verified', False),
+                    )
                 return user
             return None
-        except Exception as e:
-            print(f"Error occurred during authentication: {str(e)}")
+
+        except Exception:
             return None
 
     def get_user(self, user_id):
