@@ -10,5 +10,12 @@ class AuthClient(BaseClient):
             headers={"Authorization": f"Bearer {token}"},
         )
 
+    def login(self, username: str, password: str) -> dict[str, Any]:
+        response = self._post(
+            "/login",
+            json={"username": username, "password": password},
+        )
+        return response
+
 
 auth_client = AuthClient(base_url=f"{settings.AUTH_API_URL}/auth/jwt")

@@ -1,6 +1,9 @@
 from rest_framework import authentication
+from django.contrib.auth import get_user_model
 from rest_framework import exceptions
 from clients.auth.client import auth_client
+
+User = get_user_model()
 
 
 class Authentication(authentication.BaseAuthentication):
@@ -19,3 +22,8 @@ class Authentication(authentication.BaseAuthentication):
 
         raise exceptions.AuthenticationFailed("Not authenticated")
 
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return None
