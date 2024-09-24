@@ -37,7 +37,7 @@ class BaseClient:
             request = self._session.prepare_request(
                 Request(
                     method=method,
-                    url=urljoin(self._base_url, url),
+                    url=self._base_url + url,
                     *args,
                     **kwargs,
                 )

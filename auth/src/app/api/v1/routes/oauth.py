@@ -24,10 +24,7 @@ from app.api.v1.schemas.google_oauth import OAuth2AuthorizeResponse
 from app.settings.api import settings as api_settings
 
 router = APIRouter()
-authorize_route_name = f"oauth:{google_oauth2_client.name}.{authentication_backend.name}.authorize"
-callback_route_name = (
-    f"oauth:{google_oauth2_client.name}.{authentication_backend.name}.callback"
-)
+callback_route_name = "oauth.callback"
 oauth2_authorize_callback = OAuth2AuthorizeCallback(
     google_oauth2_client, route_name=callback_route_name
 )
@@ -36,22 +33,30 @@ state_secret = api_settings.SECRET_KEY
 
 
 @router.get(
-    "/authorize",
-    name=authorize_route_name,
+    "/{social}/authorize",
     response_model=OAuth2AuthorizeResponse,
 )
 async def authorize(
-    request: Request, scopes: list[str] = Query(None)
+    request: Request, social: str, scopes: list[str] = Query(None)
 ) -> OAuth2AuthorizeResponse:
     authorize_redirect_url = str(request.url_for(callback_route_name))
 
-    state_data: dict[str, str] = {}
-    state = generate_state_token(state_data, state_secret)
-    authorization_url = await google_oauth2_client.get_authorization_url(
-        authorize_redirect_url,
-        state,
-        scopes,
-    )
+    match social:
+        case "google":
+            state_data: dict[str, str] = {}
+            state = generate_state_token(state_data, state_secret)
+            authorization_url = (
+                await google_oauth2_client.get_authorization_url(
+                    authorize_redirect_url,
+                    state,
+                    scopes,
+                )
+            )
+        case _:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Unknown social: {social}.",
+            )
 
     return OAuth2AuthorizeResponse(authorization_url=authorization_url)
 

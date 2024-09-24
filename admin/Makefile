@@ -7,7 +7,7 @@ down:
 	docker compose down -v
 
 local:
-	docker compose -f docker-compose.local.yml up --build -d && cd ./app && python manage.py runserver
+	docker compose -f docker-compose.local.yml up --build -d
 
 migrations:
 	docker exec -ti movies python manage.py makemigrations

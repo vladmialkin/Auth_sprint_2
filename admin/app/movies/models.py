@@ -3,13 +3,55 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from movies.model_mixins import CreatedMixin, CreatedModifiedMixin, UUIDMixin
 
+import uuid
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+
+
+class CustomUserManager(BaseUserManager):
+
+    def create_superuser(self, email, password=None):
+        user = self.create_user(email, password=password)
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+
+class User(AbstractBaseUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
+    password = None
+
+    # строка с именем поля модели, которая используется в качестве уникального идентификатора
+    USERNAME_FIELD = 'email'
+
+    # менеджер модели
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return f'{self.email} {self.id}'
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
+
+    class Meta:
+        db_table = "content.user"
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")
+
 
 class Genre(UUIDMixin, CreatedModifiedMixin):
     name = models.CharField(_("name"), max_length=255)
     description = models.TextField(_("description"), blank=True)
 
     class Meta:
-        db_table = "content\".\"genre"  # fmt: skip
+        db_table = "content.genre"  # fmt: skip
         verbose_name = _("Genre")
         verbose_name_plural = _("Genres")
 
@@ -42,7 +84,7 @@ class FilmWork(UUIDMixin, CreatedModifiedMixin):
     )
 
     class Meta:
-        db_table = "content\".\"film_work"  # fmt: skip
+        db_table = "content.film_work"  # fmt: skip
         verbose_name = _("FilmWork")
         verbose_name_plural = _("FilmWorks")
 
@@ -59,7 +101,7 @@ class GenreFilmwork(UUIDMixin, CreatedMixin):
     )
 
     class Meta:
-        db_table = "content\".\"genre_film_work"  # fmt: skip
+        db_table = "content.genre_film_work"  # fmt: skip
         verbose_name = _("Filmwork genre")
         verbose_name_plural = _("Filmworks genres")
         unique_together = [["film_work", "genre"]]
@@ -72,7 +114,7 @@ class Person(UUIDMixin, CreatedModifiedMixin):
     full_name = models.CharField(_("full_name"), max_length=255)
 
     class Meta:
-        db_table = "content\".\"person"  # fmt: skip
+        db_table = "content.person"  # fmt: skip
         verbose_name = _("Person")
         verbose_name_plural = _("Persons")
 
@@ -95,7 +137,7 @@ class PersonFilmwork(UUIDMixin, CreatedMixin):
     role = models.CharField(_("role"), choices=Role.choices, max_length=255)
 
     class Meta:
-        db_table = "content\".\"person_film_work"  # fmt: skip
+        db_table = "content.person_film_work"  # fmt: skip
         verbose_name = _("Filmwork person")
         verbose_name_plural = _("Filmworks persons")
         unique_together = [["person", "film_work", "role"]]

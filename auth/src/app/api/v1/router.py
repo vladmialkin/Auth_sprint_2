@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.v1.routes.auth import router as auth_router
-from app.api.v1.routes.google_ouath import router as google_oauth_router
+from auth.src.app.api.v1.routes.oauth import router as google_oauth_router
 from app.api.v1.routes.roles import router as roles_router
 from app.api.v1.routes.session import router as session_router
 from app.api.v1.routes.user_role import router as user_role_router
@@ -15,5 +15,5 @@ router.include_router(
 )
 router.include_router(session_router, prefix="/sessions", tags=["Сессии"])
 router.include_router(
-    google_oauth_router, prefix="/oauth/google", tags=["OAuth"]
+    google_oauth_router, prefix="/oauth", tags=["OAuth"]
 )

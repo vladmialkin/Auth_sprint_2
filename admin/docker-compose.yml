@@ -1,14 +1,21 @@
 version: '3'
 
 services:
-  db:
+  movies_db:
     image: postgres:16.1
     container_name: movies_db
     restart: always
+    expose:
+      - 5432
     env_file:
-        - app/.env
+      - app/.env
     volumes:
-        - ./dbs/postgresql-data:/var/lib/postgresql/data
+      - ./dbs/postgresql-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready -U user -d db" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   service:
     image: movies_image
@@ -20,7 +27,7 @@ services:
       - ./app/static:/opt/app/static/
       - ./app/media:/opt/app/media/
     depends_on:
-            - db
+      - movies_db
     restart: always
 
   nginx:
@@ -41,4 +48,4 @@ services:
     container_name: movies_redis
     restart: always
     volumes:
-        - ./dbs/redis-data:/data/
+      - ./dbs/redis-data:/data/

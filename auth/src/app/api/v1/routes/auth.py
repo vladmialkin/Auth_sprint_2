@@ -3,9 +3,9 @@ from fastapi_users.router.common import ErrorCode
 
 from app.api.deps.fastapi_users import (
     AccessStrategy,
+    CurrentUser,
     CurrentUserByRefreshToken,
     CurrentUserToken,
-    CurrentUser,
     OAuth2Credentials,
     RefreshStrategy,
     Session,
